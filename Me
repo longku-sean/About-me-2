@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Blog | 雲端同步個人部落格</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.88);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --discord: #5865F2;
+            --discord-hover: #4752C4;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --modal-bg: rgba(15, 23, 42, 0.65);
+        }
+
+        .dark {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-glass: rgba(30, 41, 59, 0.88);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+            --modal-bg: rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button, input, textarea, select {
+            font: inherit;
+            border: none;
+            outline: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.25rem;
+            width: 100%;
+        }
+
+        /* Header Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background-color: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            height: 64px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .search-bar {
+            position: relative;
+            max-width: 320px;
+            width: 100%;
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .search-bar { display: block; }
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.45rem 1rem 0.45rem 2.2rem;
+            border-radius: 99px;
+            background-color: var(--border-color);
+            color: var(--text-main);
+            font-size: 0.875rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.92;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-discord {
+            background-color: var(--discord);
+            color: #ffffff;
+        }
+
+        .btn-cloud {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: transparent;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-icon:hover {
+            background-color: var(--border-color);
+        }
+
+        /* Hero Banner */
+        .hero {
+            padding: 2.2rem 0 1.2rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.85rem;
+            border-radius: 99px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        @media (min-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 1.25rem;
+            font-size: 0.95rem;
+        }
+
+        /* Filters Bar */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .categories {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .cat-btn {
+            padding: 0.35rem 0.9rem;
+            border-radius: 99px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .cat-btn.active {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        /* Layout Grid */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex: 1;
+        }
+
+        @media (min-width: 992px) {
+            .main-layout {
+                grid-template-columns: 1fr 300px;
+            }
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 640px) {
+            .posts-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .post-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .post-img {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+            background-color: var(--border-color);
+        }
+
+        .post-content {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .post-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .post-summary {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .post-card-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 0.35rem;
+            z-index: 5;
+        }
+
+        .action-btn-sm {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        .action-btn-sm:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            background-color: var(--bg-card);
+            border: 1px dashed var(--border-color);
+            border-radius: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .widget {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .widget-discord {
+            background: linear-gradient(135deg, #2b2d42, #1a1b26);
+            color: white;
+            border: none;
+        }
+
+        .widget-discord .btn-discord {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+            padding: 0.60rem;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background-color: var(--modal-bg);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-size: 0.875rem;
+        }
+
+        .comment-item {
+            padding: 0.75rem;
+            border-radius: 10px;
+            background-color: var(--bg-main);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--text-main);
+            color: var(--bg-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            transition: transform 0.2s ease;
+            z-index: 60;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        .article-content {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-line;
+            color: var(--text-main);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container nav-wrapper">
+            <div class="logo" onclick="resetFilter()">
+                <div class="logo-icon">N</div>
+                <span>Nexus Blog</span>
+            </div>
+
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜尋文章標題或內容...">
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn-cloud" onclick="openCloudModal()" title="設定 JSONBin 雲端資料庫">
+                    <i class="fa-solid fa-cloud"></i> <span id="cloudStatusText">雲端庫</span>
+                </button>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <i class="fa-solid fa-plus"></i> 發佈文章
+                </button>
+                <a href="https://discord.gg/RTM6CPKfp4" target="_blank" class="btn btn-discord">
+                    <i class="fa-brands fa-discord"></i> Discord
+                </a>
+                <button class="btn-icon" onclick="toggleTheme()" title="切換主題">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero container">
+        <div class="hero-badge">
+            <i class="fa-solid fa-cloud-arrow-up"></i> 方案二：JSONBin 雲端即時同步已啟用
+        </div>
+        <h1>三角洲行動 <span style="color: var(--primary);">同來玩！</span></h1>
+        <p>所有文章與留言皆可同步至雲端庫，不會因關閉瀏覽器而遺失！</p>
+    </section>
+
+    <!-- Main Section -->
+    <main class="container main-layout">
+        <div>
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="categories" id="categoryContainer"></div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);" id="postCount">文章數：0</div>
+            </div>
+
+            <!-- Posts Grid -->
+            <div id="postsGrid" class="posts-grid"></div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">
+                    <i class="fa-solid fa-cloud"></i>
+                </div>
+                <h3>雲端資料庫尚無文章</h3>
+                <p>點擊下方按鈕新增文章並自動儲存至雲端。</p>
+                <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 1rem;">
+                    <i class="fa-solid fa-pen"></i> 發佈第一篇文章
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="widget widget-discord">
+                <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+                    <i class="fa-brands fa-discord" style="font-size: 1.5rem; color: #5865F2;"></i>
+                    <h4 style="font-weight: 700;">Delta Force 戰術語音</h4>
+                </div>
+                <p style="font-size: 0.8rem; opacity: 0.88;">加入我們的 Discord 伺服器，尋找一同遊玩《三角洲行動》的隊友！</p>
+                <a href="https://discord.gg/RTM6CPKfp4" target="_blank" class="btn btn-discord">
+                    <i class="fa-solid fa-user-plus"></i> 加入 Discord 群組
+                </a>
+            </div>
+
+            <div class="widget">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h4 style="font-weight: 700;">雲端連線狀態</h4>
+                    <span class="status-badge" id="syncBadge"><i class="fa-solid fa-check"></i> 本地備份</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    可以在頂部「雲端庫」綁定你免費申請的 JSONBin Key，開啟全裝置同步功能。
+                </p>
+                <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 0.8rem;" onclick="syncFromCloud()">
+                    <i class="fa-solid fa-arrows-rotate"></i> 重新載入雲端資料
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Modal 1: Cloud Storage Setup (JSONBin.io) -->
+    <div id="cloudModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 style="font-size: 1.1rem; font-weight: 700;"><i class="fa-solid fa-cloud" style="color: #10b981;"></i> 設定 JSONBin 雲端庫 API</h3>
+                <button class="btn-icon" onclick="closeCloudModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleSaveCloudConfig(event)" class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    填入你的 <a href="https://jsonbin.io" target="_blank" style="color: var(--primary); text-decoration: underline;">JSONBin.io</a> 帳號資訊即可開啟永久雲端同步，讓所有人都能看到你發布的文章與留言。
+                </p>
+                <div class="form-group">
+                    <label>BIN ID</label>
+                    <input type="text" id="jsonbinBinId" class="form-control" placeholder="例如：65f...或留空使用預設檔">
+                </div>
+                <div class="form-group">
+                    <label>Master Key (X-Master-Key)</label>
+                    <input type="password" id="jsonbinApiKey" class="form-control" placeholder="$2b$10$...">
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <button type="button" class="btn" style="border: 1px solid var(--border-color);" onclick="resetCloudConfig()">重置設為預設</button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn" style="border: 1px solid var(--border-color);" onclick="closeCloudModal()">取消</button>
+                        <button type="submit" class="btn btn-cloud">儲存並同步</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Create / Edit Article -->
+    <div id="postModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitleText" style="font-size: 1.1rem; font-weight: 700;"><i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> 發佈新文章</h3>
+                <button class="btn-icon" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleSavePost(event)" class="modal-body">
+                <input type="hidden" id="editPostId">
+                <div class="form-group">
+                    <label>文章標題 *</label>
+                    <input type="text" id="postTitle" required class="form-control" placeholder="請輸入標題...">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div class="form-group">
+                        <label>分類標籤 *</label>
+                        <select id="postCategory" class="form-control">
+                            <option value="遊戲">遊戲 (Gaming)</option>
+                            <option value="技術開發">技術開發</option>
+                            <option value="生活隨筆">生活隨筆</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>閱讀時間</label>
+                        <input type="text" id="postReadTime" class="form-control" placeholder="例如：2 分鐘">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>封面圖片網址 (可選)</label>
+                    <input type="url" id="postImage" class="form-control" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>文章摘要 *</label>
+                    <textarea id="postSummary" required rows="2" class="form-control" placeholder="請輸入簡短摘要..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>文章內文 *</label>
+                    <textarea id="postContent" required rows="7" class="form-control" placeholder="請輸入完整內容..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button type="button" class="btn" style="border: 1px solid var(--border-color);" onclick="closePostModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">同步至雲端並儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: View Article -->
+    <div id="viewModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <span id="viewCategory" class="hero-badge" style="margin: 0;">遊戲</span>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn-icon" onclick="editCurrentPost()" title="編輯文章"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-icon" onclick="deleteCurrentPost()" style="color: #ef4444;" title="刪除文章"><i class="fa-solid fa-trash-can"></i></button>
+                    <button class="btn-icon" onclick="closeViewModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+                <h2 id="viewTitle" style="font-size: 1.5rem; font-weight: 800;">文章標題</h2>
+                <div style="display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+                    <span id="viewDate"><i class="fa-regular fa-calendar"></i> 日期</span>
+                    <span id="viewReadTime"><i class="fa-regular fa-clock"></i> 閱讀時間</span>
+                </div>
+                <img id="viewImage" src="" alt="Cover" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 12px; display: none;">
+                <div id="viewBody" class="article-content">內文</div>
+
+                <!-- Discord Join Banner inside Post -->
+                <div style="padding: 1rem; border-radius: 12px; background-color: var(--primary-light); display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">想一起組隊遊玩嗎？</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">點擊加入我們的 Discord 社群語音頻道！</div>
+                    </div>
+                    <a href="https://discord.gg/RTM6CPKfp4" target="_blank" class="btn btn-discord" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                        <i class="fa-brands fa-discord"></i> Discord
+                    </a>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+
+                <!-- Comments System -->
+                <div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem;"><i class="fa-regular fa-comments"></i> 雲端同步留言板</h4>
+                    <form onsubmit="handleCommentSubmit(event)" style="margin-bottom: 1rem;">
+                        <input type="text" id="commentAuthor" required class="form-control" placeholder="您的暱稱" style="margin-bottom: 0.5rem;">
+                        <textarea id="commentText" required rows="2" class="form-control" placeholder="寫下您的看法 (將同步存至雲端)..." style="margin-bottom: 0.5rem;"></textarea>
+                        <button type="submit" class="btn btn-primary" style="font-size: 0.8rem;">發送留言至雲端</button>
+                    </form>
+                    <div id="commentsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">提示訊息</div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Nexus Blog. 三角洲行動 同來玩 | 歡迎加入 <a href="https://discord.gg/RTM6CPKfp4" target="_blank" style="color: var(--discord); font-weight: 700;">Discord 社群組隊</a></p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const defaultArticles = [
+            {
+                id: 1,
+                title: "三角洲行動 同來玩",
+                category: "遊戲",
+                date: "2026-10-22",
+                readTime: "2 分鐘",
+                image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
+                summary: "歡迎來到《三角洲行動》（Delta Force）！強烈邀請大家一起組隊遊玩、共同戰術推進。點擊加入我們的 Discord 社群（https://discord.gg/RTM6CPKfp4）一起語音組隊！",
+                content: `《三角洲行動》（Delta Force）是一款極具戰術深度與經典戰鬥體驗的射擊遊戲！
+
+🎮 如何加入我們一起玩？
+1. 點擊網站右上角或側邊欄的 Discord 社群連結 (https://discord.gg/RTM6CPKfp4)。
+2. 進入 Discord 後至組隊頻道打個招呼！
+3. 語音頻道隨時有戰隊組隊中，隨時加入開局！
+
+快來加入我們的 Discord 伺服器，一起拉上戰友組隊出擊吧！🔥`
+            }
+        ];
+
+        // Store
+        let state = {
+            posts: [...defaultArticles],
+            comments: {}
+        };
+
+        let currentCategory = 'All';
+        let searchQuery = '';
+        let activePostId = null;
+
+        // Cloud Config
+        let cloudConfig = {
+            binId: localStorage.getItem('nexus_bin_id') || '',
+            apiKey: localStorage.getItem('nexus_api_key') || ''
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderCategories();
+            syncFromCloud();
+        });
+
+        // Theme Handling
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(isDark ? '切換至深色模式' : '切換至淺色模式');
+        }
+
+        // Cloud Sync Engines (JSONBin Integration)
+        async function syncFromCloud() {
+            showToast('正在與雲端同步資料...');
+            
+            if (!cloudConfig.binId || !cloudConfig.apiKey) {
+                // Read from local storage fallback if cloud API key not provided
+                const localData = localStorage.getItem('nexus_cloud_data');
+                if (localData) {
+                    try { state = JSON.parse(localData); } catch(e){}
+                }
+                updateSyncBadge(false);
+                renderPosts();
+                showToast('已從本地備份讀取資料');
+                return;
+            }
+
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}/latest`, {
+                    headers: { 'X-Master-Key': cloudConfig.apiKey }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.record && data.record.posts) {
+                        state = data.record;
+                        localStorage.setItem('nexus_cloud_data', JSON.stringify(state));
+                        updateSyncBadge(true);
+                        showToast('成功讀取最新雲端庫資料！');
+                    }
+                } else {
+                    throw new Error('API Error');
+                }
+            } catch (err) {
+                console.warn('Cloud sync error, falling back to local storage', err);
+                const localData = localStorage.getItem('nexus_cloud_data');
+                if (localData) {
+                    try { state = JSON.parse(localData); } catch(e){}
+                }
+                updateSyncBadge(false);
+                showToast('無法連線至雲端，使用本地暫存');
+            }
+
+            renderPosts();
+        }
+
+        async function saveToCloud() {
+            // Always save to localStorage backup
+            localStorage.setItem('nexus_cloud_data', JSON.stringify(state));
+
+            if (!cloudConfig.binId || !cloudConfig.apiKey) {
+                renderPosts();
+                showToast('已儲存至本地備份');
+                return;
+            }
+
+            showToast('正同步寫入雲端庫...');
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': cloudConfig.apiKey
+                    },
+                    body: JSON.stringify(state)
+                });
+                if (res.ok) {
+                    updateSyncBadge(true);
+                    showToast('雲端同步寫入成功！');
+                } else {
+                    throw new Error('Failed to update cloud');
+                }
+            } catch (err) {
+                showToast('雲端寫入失敗，已暫存於本地');
+                updateSyncBadge(false);
+            }
+
+            renderPosts();
+        }
+
+        function updateSyncBadge(isLive) {
+            const badge = document.getElementById('syncBadge');
+            if (isLive) {
+                badge.className = 'status-badge';
+                badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> 雲端連線中';
+            } else {
+                badge.className = 'status-badge';
+                badge.style.backgroundColor = 'rgba(234, 179, 8, 0.15)';
+                badge.style.color = '#eab308';
+                badge.innerHTML = '<i class="fa-solid fa-hard-drive"></i> 本地暫存';
+            }
+        }
+
+        // Cloud Config Controls
+        function openCloudModal() {
+            document.getElementById('jsonbinBinId').value = cloudConfig.binId;
+            document.getElementById('jsonbinApiKey').value = cloudConfig.apiKey;
+            document.getElementById('cloudModal').classList.add('active');
+        }
+
+        function closeCloudModal() {
+            document.getElementById('cloudModal').classList.remove('active');
+        }
+
+        function handleSaveCloudConfig(e) {
+            e.preventDefault();
+            cloudConfig.binId = document.getElementById('jsonbinBinId').value.trim();
+            cloudConfig.apiKey = document.getElementById('jsonbinApiKey').value.trim();
+
+            localStorage.setItem('nexus_bin_id', cloudConfig.binId);
+            localStorage.setItem('nexus_api_key', cloudConfig.apiKey);
+
+            closeCloudModal();
+            syncFromCloud();
+        }
+
+        function resetCloudConfig() {
+            cloudConfig.binId = '';
+            cloudConfig.apiKey = '';
+            localStorage.removeItem('nexus_bin_id');
+            localStorage.removeItem('nexus_api_key');
+            document.getElementById('jsonbinBinId').value = '';
+            document.getElementById('jsonbinApiKey').value = '';
+            showToast('已重置雲端庫設定');
+        }
+
+        // Render Functions
+        function renderCategories() {
+            const cats = ['All', '遊戲', '技術開發', '生活隨筆'];
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = cats.map(cat => `
+                <button class="cat-btn ${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
+                    ${cat === 'All' ? '全部文章' : cat}
+                </button>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            renderCategories();
+            renderPosts();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderPosts();
+        }
+
+        function resetFilter() {
+            currentCategory = 'All';
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            renderCategories();
+            renderPosts();
+        }
+
+        function renderPosts() {
+            const grid = document.getElementById('postsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const countText = document.getElementById('postCount');
+
+            const filtered = state.posts.filter(p => {
+                const matchCat = currentCategory === 'All' || p.category === currentCategory;
+                const matchSearch = p.title.toLowerCase().includes(searchQuery) || p.summary.toLowerCase().includes(searchQuery);
+                return matchCat && matchSearch;
+            });
+
+            countText.textContent = `文章數：${filtered.length}`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            grid.innerHTML = filtered.map(p => `
+                <div class="post-card" onclick="openViewModal(${p.id})">
+                    <div class="post-card-actions" onclick="event.stopPropagation()">
+                        <button class="action-btn-sm" onclick="openEditModal(${p.id})" title="編輯"><i class="fa-solid fa-pen"></i></button>
+                        <button class="action-btn-sm" onclick="quickDeletePost(${p.id})" title="刪除"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    ${p.image ? `<img src="${p.image}" class="post-img" alt="cover">` : ''}
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span><i class="fa-regular fa-calendar"></i> ${p.date}</span>
+                            <span>•</span>
+                            <span style="color: var(--primary); font-weight: 700;">${p.category}</span>
+                            <span>•</span>
+                            <span><i class="fa-regular fa-clock"></i> ${p.readTime || '2 分鐘'}</span>
+                        </div>
+                        <h3 class="post-title">${escapeHtml(p.title)}</h3>
+                        <p class="post-summary">${escapeHtml(p.summary)}</p>
+                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-top: auto;">閱讀全文 &rarr;</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Create / Edit Modal Controls
+        function openCreateModal() {
+            document.getElementById('editPostId').value = '';
+            document.getElementById('modalTitleText').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> 發佈新文章';
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postCategory').value = '遊戲';
+            document.getElementById('postReadTime').value = '2 分鐘';
+            document.getElementById('postImage').value = '';
+            document.getElementById('postSummary').value = '';
+            document.getElementById('postContent').value = '';
+            document.getElementById('postModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const p = state.posts.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('editPostId').value = p.id;
+            document.getElementById('modalTitleText').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> 編輯文章';
+            document.getElementById('postTitle').value = p.title;
+            document.getElementById('postCategory').value = p.category;
+            document.getElementById('postReadTime').value = p.readTime || '2 分鐘';
+            document.getElementById('postImage').value = p.image || '';
+            document.getElementById('postSummary').value = p.summary;
+            document.getElementById('postContent').value = p.content;
+            document.getElementById('postModal').classList.add('active');
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.remove('active');
+        }
+
+        function handleSavePost(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editPostId').value;
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const readTime = document.getElementById('postReadTime').value.trim() || '2 分鐘';
+            const image = document.getElementById('postImage').value.trim();
+            const summary = document.getElementById('postSummary').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+
+            if (editId) {
+                const index = state.posts.findIndex(p => p.id === parseInt(editId));
+                if (index !== -1) {
+                    state.posts[index] = { ...state.posts[index], title, category, readTime, image, summary, content };
+                }
+            } else {
+                const newPost = {
+                    id: Date.now(),
+                    title,
+                    category,
+                    readTime,
+                    image,
+                    summary,
+                    content,
+                    date: new Date().toISOString().split('T')[0]
+                };
+                state.posts.unshift(newPost);
+            }
+
+            closePostModal();
+            saveToCloud();
+        }
+
+        // View Post Modal Controls
+        function openViewModal(id) {
+            const p = state.posts.find(item => item.id === id);
+            if (!p) return;
+
+            activePostId = id;
+            document.getElementById('viewTitle').textContent = p.title;
+            document.getElementById('viewCategory').textContent = p.category;
+            document.getElementById('viewDate').innerHTML = `<i class="fa-regular fa-calendar"></i> ${p.date}`;
+            document.getElementById('viewReadTime').innerHTML = `<i class="fa-regular fa-clock"></i> ${p.readTime || '2 分鐘'}`;
+            document.getElementById('viewBody').innerText = p.content;
+
+            const imgEl = document.getElementById('viewImage');
+            if (p.image) {
+                imgEl.src = p.image;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
+            renderComments(id);
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.remove('active');
+            activePostId = null;
+        }
+
+        function editCurrentPost() {
+            if (!activePostId) return;
+            const id = activePostId;
+            closeViewModal();
+            openEditModal(id);
+        }
+
+        function deleteCurrentPost() {
+            if (!activePostId) return;
+            quickDeletePost(activePostId);
+            closeViewModal();
+        }
+
+        function quickDeletePost(id) {
+            if (confirm('確定要刪除這篇文章嗎？')) {
+                state.posts = state.posts.filter(p => p.id !== id);
+                saveToCloud();
+            }
+        }
+
+        // Comment Logic
+        function renderComments(postId) {
+            const list = state.comments[postId] || [];
+            const container = document.getElementById('commentsList');
+
+            if (list.length === 0) {
+                container.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-muted);">尚無雲端留言，歡迎搶先發表！</p>';
+                return;
+            }
+
+            container.innerHTML = list.map(c => `
+                <div class="comment-item">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <span style="font-weight: 700; color: var(--primary);">${escapeHtml(c.author)}</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">${c.date}</span>
+                    </div>
+                    <div>${escapeHtml(c.text)}</div>
+                </div>
+            `).join('');
+        }
+
+        function handleCommentSubmit(e) {
+            e.preventDefault();
+            if (!activePostId) return;
+
+            const author = document.getElementById('commentAuthor').value.trim();
+            const text = document.getElementById('commentText').value.trim();
+
+            if (!state.comments[activePostId]) {
+                state.comments[activePostId] = [];
+            }
+
+            state.comments[activePostId].unshift({
+                author,
+                text,
+                date: new Date().toLocaleDateString()
+            });
+
+            document.getElementById('commentAuthor').value = '';
+            document.getElementById('commentText').value = '';
+
+            renderComments(activePostId);
+            saveToCloud();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+        }
+    </script>
+</body>
+</html>
